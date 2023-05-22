@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Include jQuery and jQuery UI libraries -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script>
+    $( function() {
+        $( "#start_date" ).datepicker({ dateFormat: 'mm/dd/yy' });
+        $( "#end_date" ).datepicker({ dateFormat: 'mm/dd/yy' });
+    } );
+    </script>
+</head>
+<body>
+    <form action="/" method="post">
+        <label for="graph_type">Graph Type:</label><br>
+        <select id="graph_type" name="graph_type">
+            <option selected disabled>Select Graph Type</option>
+            <option value="stacked_bar" {% if request.form.graph_type == "stacked_bar" %}selected{% endif %}>Stacked Bar</option>
+            <option value="stacked_line" {% if request.form.graph_type == "stacked_line" %}selected{% endif %}>Stacked Line</option>
+        </select><br>
+        <label for="start_date">Start Date:</label><br>
+        <input type="text" id="start_date" name="start_date" readonly value="{{ request.form.start_date if request.form.start_date else 'Select Date' }}"><br>
+        <label for="end_date">End Date:</label><br>
+        <input type="text" id="end_date" name="end_date" readonly value="{{ request.form.end_date if request.form.end_date else 'Select Date' }}"><br>
+        <label for="category">Category:</label><br>
+        <select id="category" name="category">
+            <option selected disabled>Select Category</option>
+            {% for category in categories %}
+                <option value="{{ category }}" {% if request.form.category == category %}selected{% endif %}>{{ category.strip('"') }}</option>
+            {% endfor %}
+        </select><br>
+        <input type="submit" value="Generate graph">
+    </form>
+    {% if img %}
+        <img src="data:image/png;base64, {{ img }}" />
+    {% endif %}
+</body>
+</html>
