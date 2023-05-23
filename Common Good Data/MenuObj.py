@@ -28,6 +28,9 @@ class Menu:
             for date in location.dates.values():
                 categories.update(date.keys())
         return sorted(list(categories))  
+    
+    def get_all_locations(self):
+        return list(self.locations.keys()) 
 
     def is_date_valid(self, date):
         first_location = next(iter(self.locations.values()))
