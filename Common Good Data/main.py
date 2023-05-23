@@ -1,9 +1,8 @@
 import os
 import pickle
 import shutil
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd  # importing pandas
+import plotly.graph_objs as go
+import pandas as pd
 from datetime import datetime
 from MenuObj import Menu
 from MenuObj import Category
@@ -36,99 +35,102 @@ def main():
 
     save_menu(menu)
 
-def plot_graph(menu, graph_type, start_date=None, end_date=None, category=None):
-    if graph_type == 'stacked_bar':
-        plot_stacked_bar(menu, start_date)
-    elif graph_type == 'stacked_line':
-        if start_date is None or end_date is None or category is None:
-            print("Error: Missing argument for stacked line graph")
-        else:
-            plot_stacked_line(menu, start_date, end_date, category)
-
-def plot_stacked_line(menu, start_date, end_date, category):
+def plot_graph(menu, start_date=None, end_date=None, categories=None, locations=None):
+    # handles different types of graphs
     if not menu.is_date_range_valid(start_date, end_date):
         print("Error: Invalid date range")
         return
-
+    
+    if len(categories) == 1:
+        return plot_line_chart_multi_location(menu, start_date, end_date, locations, categories[0])
+    else:
+        return plot_line_chart_multi_category(menu, start_date, end_date, locations[0], categories)
+        
+def plot_line_chart_multi_location(menu, start_date, end_date, locations, category):
     dates = menu.get_date_range(start_date, end_date)
-    location_names = menu.get_sorted_location_names()
+    location_data = calculate_percent_contributions_multi_location(menu, dates, locations, category)
 
-    location_data = calculate_percent_contributions(menu, dates, location_names, category)
+    data = []
+    for i in range(len(locations)):
+        trace = go.Scatter(
+            x = dates,
+            y = location_data[i],
+            mode = 'lines',
+            name = locations[i]
+        )
+        data.append(trace)
 
-    plot_line_chart(dates, location_data, location_names, category)
+    layout = go.Layout(
+        title = f'Percentage Contribution by Date for {category} at Each Location',
+        xaxis = dict(title = 'Date'),
+        yaxis = dict(title = 'Percentage Contribution (%)'),
+    )
 
-def plot_stacked_bar(menu, date):
-    if not menu.is_date_valid(date):
-        print("Error: Invalid date")
-        return
+    fig = go.Figure(data=data, layout=layout)
+    plot_div = fig.to_html(full_html=False)
 
-    categories = menu.get_categories(date)
-    location_names = menu.get_sorted_location_names()
+    return plot_div
 
-    location_data = calculate_percent_contributions_for_bar(menu, date, categories, location_names)
+def plot_line_chart_multi_category(menu, start_date, end_date, location, categories):
+    dates = menu.get_date_range(start_date, end_date)
+    category_data = calculate_percent_contributions_multi_category(menu, dates, location, categories)
 
-    plot_bar_chart(categories, location_data, location_names, date)
+    data = []
+    for i in range(len(categories)):
+        trace = go.Scatter(
+            x = dates,
+            y = category_data[i],
+            mode = 'lines',
+            name = categories[i]
+        )
+        data.append(trace)
 
-def calculate_percent_contributions(menu, dates, location_names, category):
+    layout = go.Layout(
+        title = f'Percentage Contribution by Date at {location} for each Category',
+        xaxis = dict(title = 'Date'),
+        yaxis = dict(title = 'Percentage Contribution (%)'),
+    )
+
+    fig = go.Figure(data=data, layout=layout)
+    plot_div = fig.to_html(full_html=False)
+
+    return plot_div
+
+def calculate_percent_contributions_multi_location(menu, dates, locations, category):
     location_data = []
 
-    for location_name in location_names:
-        location = menu.locations[location_name]
+    for location_name in locations:
+        location = menu.locations.get(location_name)
         location_percent_contributions = []
-
-        for date in dates:
-            gross_amt = location.dates.get(date, {}).get(category, Category([0]*6)).gross_amt
-            total_gross_amt = sum([loc.dates.get(date, {}).get(category, Category([0]*6)).gross_amt for loc in menu.locations.values()])
-            percent_contribution = gross_amt / total_gross_amt * 100 if total_gross_amt != 0 else 0
-            location_percent_contributions.append(percent_contribution)
-
-        location_data.append(location_percent_contributions)
+        if location is not None:
+            for date in dates:
+                gross_amt = location.dates.get(date, {}).get(category, Category([0]*6)).gross_amt
+                total_gross_amt = sum([loc.dates.get(date, {}).get(category, Category([0]*6)).gross_amt for loc in menu.locations.values()])
+                percent_contribution = gross_amt / total_gross_amt * 100 if total_gross_amt != 0 else 0
+                location_percent_contributions.append(percent_contribution)
+            location_data.append(location_percent_contributions)
+        else:
+            location_data.append([0]*len(dates))  # no data for this location, so append zeroes
 
     return location_data
 
-def calculate_percent_contributions_for_bar(menu, date, categories, location_names):
-    total_gross_amounts = {category: 0 for category in categories}
-    for location in menu.locations.values():
+def calculate_percent_contributions_multi_category(menu, dates, location_name, categories):
+    category_data = []
+    location = menu.locations.get(location_name)
+    if location is not None:
         for category in categories:
-            total_gross_amounts[category] += location.dates.get(date, {}).get(category, Category([0]*6)).gross_amt
+            category_percent_contributions = []
+            for date in dates:
+                gross_amt = location.dates.get(date, {}).get(category, Category([0]*6)).gross_amt
+                total_gross_amt = sum([location.dates.get(date, {}).get(cat, Category([0]*6)).gross_amt for cat in categories])
+                percent_contribution = gross_amt / total_gross_amt * 100 if total_gross_amt != 0 else 0
+                category_percent_contributions.append(percent_contribution)
+            category_data.append(category_percent_contributions)
+    else:
+        for _ in categories:
+            category_data.append([0]*len(dates))  # no data for this location, so append zeroes for each category
 
-    location_data = []
-
-    for location_name in location_names:
-        location = menu.locations[location_name]
-        gross_amounts = [location.dates.get(date, {}).get(category, Category([0]*6)).gross_amt for category in categories]
-        percent_contributions = [gross_amt / total_gross_amounts[category] * 100 if total_gross_amounts[category] != 0 else 0 for gross_amt, category in zip(gross_amounts, categories)]
-        location_data.append(percent_contributions)
-
-    return location_data
-
-def plot_line_chart(dates, location_data, location_names, category):
-    plt.figure(figsize=(10,6))
-
-    for i, percent_contributions in enumerate(location_data):
-        plt.plot(dates, percent_contributions, label=location_names[i])
-
-    plt.xlabel('Date')
-    plt.ylabel('Percentage Contribution (%)')
-    plt.title(f'Percentage Contribution by Date for {category} at Each Location')
-    plt.legend()
-    plt.tight_layout()
-
-def plot_bar_chart(categories, location_data, location_names, date):
-    bar_pos = np.arange(len(categories))
-
-    plt.figure(figsize=(10,6))
-
-    plt.bar(bar_pos, location_data[0], label=location_names[0])
-    for i in range(1, len(location_names)):
-        plt.bar(bar_pos, location_data[i], bottom=np.sum(location_data[:i], axis=0), label=location_names[i])
-
-    plt.xlabel('Categories')
-    plt.ylabel('Percentage Contribution (%)')
-    plt.title(f'Percentage Contribution by Category for Each Location on {date}')
-    plt.xticks(bar_pos, categories, rotation=45, ha='right')
-    plt.legend()
-    plt.tight_layout()
+    return category_data
 
 def open_file(name):
     return open(name,"r")
