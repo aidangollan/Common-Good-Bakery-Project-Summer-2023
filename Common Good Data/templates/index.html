@@ -2,7 +2,10 @@
 <html>
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <!-- Include jQuery and jQuery UI libraries -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -10,32 +13,94 @@
     $( function() {
         $( "#start_date" ).datepicker({ dateFormat: 'mm/dd/yy' });
         $( "#end_date" ).datepicker({ dateFormat: 'mm/dd/yy' });
+
+        // Code for handling select all functionality
+        $("#select_all_categories").click(function(){
+            $('input[name="category"]').not(this).prop('checked', this.checked);
+        });
+        
+        $("#select_all_locations").click(function(){
+            $('input[name="location"]').not(this).prop('checked', this.checked);
+        });
     } );
     </script>
 </head>
 <body>
-    <form action="/" method="post">
-        <label for="graph_type">Graph Type:</label><br>
-        <select id="graph_type" name="graph_type">
-            <option selected disabled>Select Graph Type</option>
-            <option value="stacked_bar" {% if request.form.graph_type == "stacked_bar" %}selected{% endif %}>Stacked Bar</option>
-            <option value="stacked_line" {% if request.form.graph_type == "stacked_line" %}selected{% endif %}>Stacked Line</option>
-        </select><br>
-        <label for="start_date">Start Date:</label><br>
-        <input type="text" id="start_date" name="start_date" readonly value="{{ request.form.start_date if request.form.start_date else 'Select Date' }}"><br>
-        <label for="end_date">End Date:</label><br>
-        <input type="text" id="end_date" name="end_date" readonly value="{{ request.form.end_date if request.form.end_date else 'Select Date' }}"><br>
-        <label for="category">Category:</label><br>
-        <select id="category" name="category">
-            <option selected disabled>Select Category</option>
-            {% for category in categories %}
-                <option value="{{ category }}" {% if request.form.category == category %}selected{% endif %}>{{ category.strip('"') }}</option>
-            {% endfor %}
-        </select><br>
-        <input type="submit" value="Generate graph">
+    <form action="/" method="post" class="form-row">
+        <div class="form-group col-md-4">
+            <label for="graph_type">Graph Type:</label>
+            <select id="graph_type" name="graph_type" class="form-control">
+                <option selected disabled>Select Graph Type</option>
+                <option value="stacked_line" {% if request.form.graph_type == "stacked_line" %}selected{% endif %}>Stacked Line</option>
+            </select>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="start_date">Start Date:</label>
+            <input type="text" id="start_date" name="start_date" readonly value="{{ request.form.start_date if request.form.start_date else 'Select Date' }}" class="form-control">
+        </div>
+        <div class="form-group col-md-4">
+            <label for="end_date">End Date:</label>
+            <input type="text" id="end_date" name="end_date" readonly value="{{ request.form.end_date if request.form.end_date else 'Select Date' }}" class="form-control">
+        </div>
+
+        <div class="form-group col-md-6">
+            <label for="category">Category:</label>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Categories
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="select_all_categories">
+                        <label class="form-check-label" for="select_all_categories">
+                            Select All
+                        </label>
+                    </div>
+                    {% for category in categories %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="{{ category }}" id="category{{ loop.index }}" name="category"
+                            {% if category in request.form.getlist("category") %} checked {% endif %}>
+                            <label class="form-check-label" for="category{{ loop.index }}">
+                                {{ category.strip('"') }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-md-6">
+            <label for="location">Location:</label>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Locations
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="select_all_locations">
+                        <label class="form-check-label" for="select_all_locations">
+                            Select All
+                        </label>
+                    </div>
+                    {% for location in locations %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="{{ location }}" id="location{{ loop.index }}" name="location"
+                        {% if location in request.form.getlist("location") %} checked {% endif %}>
+                            <label class="form-check-label" for="location{{ loop.index }}">
+                                {{ location.strip('"') }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-md-12">
+            <input type="submit" value="Generate graph" class="btn btn-primary">
+        </div>
     </form>
-    {% if img %}
-        <img src="data:image/png;base64, {{ img }}" />
+    {% if plot_div %}
+        {{ plot_div | safe }}
     {% endif %}
 </body>
 </html>
