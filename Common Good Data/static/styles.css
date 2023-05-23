@@ -8,7 +8,7 @@ body {
 
 form {
     margin: 20px auto;
-    max-width: 500px;
+    max-width: 800px;
     padding: 20px;
 }
 
@@ -17,16 +17,21 @@ label {
     margin-bottom: 5px;
 }
 
-input[type="text"], select {
-    display: block;
+.input-group {
     margin-bottom: 20px;
-    padding: 10px;
-    width: 100%;
+}
+
+.form-control {
     cursor: pointer;
     -webkit-appearance: button;
     -moz-appearance: button;
     appearance: button;
     text-align: left;
+}
+
+.dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 input[type="submit"] {
