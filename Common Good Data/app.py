@@ -16,6 +16,9 @@ def home():
 
     plot_div = None
     if request.method == 'POST':
+        chart_option = request.form.get('graph_type')
+        category_option = request.form.get('category_option')
+        location_option = request.form.get('location_option')
         start_date = request.form.get('start_date')
         end_date = request.form.get('end_date')
         selected_categories = request.form.getlist('category')
@@ -24,7 +27,7 @@ def home():
         start_date_dt = datetime.strptime(start_date, "%m/%d/%Y")
         end_date_dt = datetime.strptime(end_date, "%m/%d/%Y")
 
-        plot_div = plot_graph(menu, start_date_dt, end_date_dt, selected_categories, selected_locations)
+        plot_div = plot_graph(menu, chart_option, start_date_dt, end_date_dt, selected_categories, selected_locations, category_option, location_option)
 
     return render_template('index.html', plot_div=plot_div, categories=categories, locations=locations)
 
