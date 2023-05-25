@@ -9,8 +9,6 @@ from MenuObj import Menu
 from MenuObj import Category
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-import os
-
 def main():
     menu = load_menu()
 
