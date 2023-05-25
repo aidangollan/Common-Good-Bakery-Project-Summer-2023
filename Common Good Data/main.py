@@ -43,31 +43,38 @@ def plot_graph(menu, chart_option, start_date, end_date, categories, locations, 
     dates = menu.get_date_range(start_date, end_date)
     category_data = calculate_percent_contributions(menu, dates, categories, "category", locations)
     location_data = calculate_percent_contributions(menu, dates, locations, "location", categories)
-    options = [category_option, location_option]
-    if options[0].strip('_')[0] != options[1].strip('_')[0]:
+    if category_option.strip('_')[0] != location_option.strip('_')[0]:
         if chart_option == 'line_chart':
-            if options[0] == "aggregate_categories":
+            if category_option == "aggregate_categories":
                 return plot_line_chart(dates, categories, locations, location_data, None)
             else:
                 return plot_line_chart(dates, categories, locations, None, category_data)
         elif chart_option == 'pie_chart':
-            if options[0] == "aggregate_categories":
+            if category_option == "aggregate_categories":
                 return plot_pie_chart(categories, locations, location_data, None)
             else:
                 return plot_pie_chart(categories, locations, None, category_data)
 
 def plot_pie_chart(categories, locations, location_data, category_data):
     if location_data != None:
-        data = make_pie_data(locations, location_data)
+        location_data_aggregate = aggregate_pie_data(location_data)
+        data = plot_pie_data(locations, location_data_aggregate)
         layout = make_layout(categories, "Categories", "Location")
     else:
-        data = make_pie_data(categories, category_data)
+        category_data_aggregate = aggregate_pie_data(category_data)
+        data = plot_pie_data(categories, category_data_aggregate)
         layout = make_layout(locations, "Locations", "Category")
 
     fig = go.Figure(data=data, layout=layout)
     plot_div = fig.to_html(full_html=False)
 
     return plot_div
+
+def aggregate_pie_data(data):
+    data_out = []
+    for list in data:
+        data_out.append(sum(list) / len(list))
+    return [data_out]
 
 def plot_line_chart(dates, categories, locations, location_data, category_data):
     if location_data != None:
@@ -82,7 +89,7 @@ def plot_line_chart(dates, categories, locations, location_data, category_data):
 
     return plot_div
 
-def make_pie_data(names, values):
+def plot_pie_data(names, values):
     data = []
     for i in range(len(values)):
         trace = Pie(
