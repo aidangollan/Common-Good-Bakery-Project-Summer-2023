@@ -7,15 +7,20 @@ import pandas as pd
 from datetime import datetime
 from MenuObj import Menu
 from MenuObj import Category
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+import os
 
 def main():
     menu = load_menu()
 
-    folder = "daily files/unprocessed"
+    script_dir = os.path.dirname(os.path.realpath(__file__))  # get the directory of this script
+    unprocessed_folder = os.path.join(script_dir, "daily files/unprocessed")  # get the unprocessed folder path
+    processed_folder = os.path.join(script_dir, "daily files/processed")  # get the processed folder path
 
-    for filename in os.listdir(folder):
+    for filename in os.listdir(unprocessed_folder):
         if filename.endswith(".xls"):  # checking if file is .xls
-            xls_filepath = os.path.join(folder, filename)
+            xls_filepath = os.path.join(unprocessed_folder, filename)
             csv_filepath = xls_filepath.replace('.xls', '.csv')  # new csv filepath
             
             # convert xls to csv
@@ -23,16 +28,17 @@ def main():
             df.to_csv(csv_filepath, index=False)
 
             filename = filename.replace('.xls', '.csv')  # update filename to csv
-            filepath = os.path.join(folder, filename)  # update filepath to csv
+            filepath = os.path.join(unprocessed_folder, filename)  # update filepath to csv
             
             os.remove(xls_filepath)  # remove original xls file after conversion
 
         else:
-            filepath = os.path.join(folder, filename)
+            filepath = os.path.join(unprocessed_folder, filename)
 
         with open_file(filepath) as file:
             menu.handle_file(file)
-        shutil.move(filepath, 'daily files/processed/' + filename)
+
+        shutil.move(filepath, os.path.join(processed_folder, filename))
 
     save_menu(menu)
 
@@ -148,15 +154,17 @@ def open_file(name):
     return open(name,"r")
 
 def load_menu():
+    menu_file = os.path.join(BASE_DIR, 'menu.pickle')
     try:
-        with open('menu.pickle', 'rb') as f:
+        with open(menu_file, 'rb') as f:
             menu = pickle.load(f)
     except FileNotFoundError:
         menu = Menu()
     return menu
 
 def save_menu(menu):
-    with open('menu.pickle', 'wb') as f:
+    menu_file = os.path.join(BASE_DIR, 'menu.pickle')
+    with open(menu_file, 'wb') as f:
         pickle.dump(menu, f)
 
 if __name__ == "__main__":
