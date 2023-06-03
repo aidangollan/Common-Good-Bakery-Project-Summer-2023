@@ -7,14 +7,21 @@ import pandas as pd
 from datetime import datetime
 from MenuObj import Menu
 from MenuObj import Category
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def main():
-    menu = load_menu()
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.realpath(__file__))
 
-    script_dir = os.path.dirname(os.path.realpath(__file__))  # get the directory of this script
-    unprocessed_folder = os.path.join(script_dir, "daily files/unprocessed")  # get the unprocessed folder path
-    processed_folder = os.path.join(script_dir, "daily files/processed")  # get the processed folder path
+    # Construct the path to the "daily files/unprocessed" directory
+    unprocessed_folder = os.path.join(script_dir, "daily files", "unprocessed")
+
+    # Construct the path to the "daily files/processed" directory
+    processed_folder = os.path.join(script_dir, "daily files", "processed")
+
+    # Construct the path to the pickle file
+    pickle_path = os.path.join(script_dir, 'menu.pickle')
+
+    menu = load_menu(pickle_path)
 
     for filename in os.listdir(unprocessed_folder):
         if filename.endswith(".xls"):  # checking if file is .xls
@@ -35,10 +42,9 @@ def main():
 
         with open_file(filepath) as file:
             menu.handle_file(file)
-
         shutil.move(filepath, os.path.join(processed_folder, filename))
 
-    save_menu(menu)
+    save_menu(menu, pickle_path)
 
 def plot_graph(menu, chart_option, start_date, end_date, categories, locations, category_option, location_option):
     if not menu.is_date_range_valid(start_date, end_date):
@@ -151,18 +157,16 @@ def sum_gross_amt(menu, date, base_item, base_item_type, cross_items):
 def open_file(name):
     return open(name,"r")
 
-def load_menu():
-    menu_file = os.path.join(BASE_DIR, 'menu.pickle')
+def load_menu(pickle_path):
     try:
-        with open(menu_file, 'rb') as f:
+        with open(pickle_path, 'rb') as f:
             menu = pickle.load(f)
     except FileNotFoundError:
         menu = Menu()
     return menu
 
-def save_menu(menu):
-    menu_file = os.path.join(BASE_DIR, 'menu.pickle')
-    with open(menu_file, 'wb') as f:
+def save_menu(menu, pickle_path):
+    with open(pickle_path, 'wb') as f:
         pickle.dump(menu, f)
 
 if __name__ == "__main__":
