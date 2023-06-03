@@ -2,15 +2,17 @@ from flask import Flask, render_template, request
 from datetime import datetime
 from main import load_menu, main, plot_graph
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 CORS(app) # This will enable CORS for all routes
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    main()
-    menu = load_menu()
-
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    pickle_path = os.path.join(script_dir, 'menu.pickle')
+    #main()
+    menu = load_menu(pickle_path)
     categories = menu.get_all_categories()
     locations = menu.get_all_locations()
 
