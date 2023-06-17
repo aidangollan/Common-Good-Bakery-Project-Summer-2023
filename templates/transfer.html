@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transfer</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div style="text-align: right; margin: 10px;">
+        <a href="{{ url_for('home') }}" class="btn btn-primary btn-sm">Home</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-primary btn-sm">Logout</a>
+    </div>
+    <div class="container">
+        <h1>Transfer Page</h1>
+        <button onclick="window.location.href='{{ url_for('add_transfer') }}';" class="btn-center">Add Transfer</button>
+        <button onclick="window.location.href='{{ url_for('view_transfers') }}';" class="btn-center">View Open Transfers</button>
+    </div>
+</body>
+</html>

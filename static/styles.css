@@ -1,0 +1,49 @@
+body {
+    background-color: #f8f9fa;
+    color: #212529;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.nav-links {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    text-align: center;
+}
+
+.nav-links li {
+    display: inline-block;
+}
+
+.nav-links li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.error {
+    color: red;
+}
+
+.form-center {
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.btn-center {
+    display: block;
+    width: 100%;
+}

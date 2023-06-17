@@ -1,0 +1,4 @@
+hashed_password = bcrypt.generate_password_hash("aaa").decode('utf-8')
+user = User(username="aidan", password=hashed_password)
+db.session.add(user)
+db.session.commit()

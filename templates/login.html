@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Login</h1>
+            {% if error_message %}
+                <p class="error">{{ error_message }}</p>
+            {% endif %}
+            <form action="{{ url_for('login') }}" method="post" novalidate class="form-center">
+                <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+                <div class="input-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" class="form-control {% if 'username' in error_fields %}input-error{% endif %}">
+                    {% if 'username' in error_fields %}
+                        <div class="error-message">Please enter a username</div>
+                    {% endif %}
+                </div>
+                <div class="input-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" class="form-control {% if 'password' in error_fields %}input-error{% endif %}">
+                    {% if 'password' in error_fields %}
+                        <div class="error-message">Please enter a password</div>
+                    {% endif %}
+                </div>
+                <div class="input-group">
+                    <input type="submit" value="Login" class="btn-center">
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
