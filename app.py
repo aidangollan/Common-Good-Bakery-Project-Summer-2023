@@ -33,7 +33,7 @@ def load_user(user_id):
 
 @app.route('/')
 def home():
-#    add_user()
+    #add_user()
     update_db(db)
     return render_template('home.html')
 

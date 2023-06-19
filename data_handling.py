@@ -32,11 +32,11 @@ class Category(db.Model):
 def update_db(db):
     processed_files = load_processed_files()
     for file_name in os.listdir(CSV_FILES_DIR):
-        if file_name not in PROCESSED_FILES:
+        categories = []
+        if file_name not in processed_files:
             file_path = os.path.join(CSV_FILES_DIR, file_name)
             with open(file_path, 'r') as file:
                 categories = process_file(file)
-            # Update the list of processed files
             processed_files.append(file_name)
             save_processed_files(processed_files)
         for category in categories:
@@ -66,7 +66,7 @@ def process_file(file):
             break
         if skip:
             continue        
-        name = line[1]
+        name = line[1].strip('"')
         order_count = to_int(line[2])
         item_count = to_int(line[3])
         gross_amt = to_int(line[4])
