@@ -1,4 +1,4 @@
-from db import db
+from init import db
 from util import to_float, to_int
 from datetime import datetime
 import os

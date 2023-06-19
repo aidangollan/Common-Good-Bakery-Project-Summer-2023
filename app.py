@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from transfer import transfer as transfer_blueprint
 from flask_bcrypt import Bcrypt
-from db import db
+from init import db, mail
+from transfer import transfer as transfer_blueprint
 from data_handling import Category, update_db
 
 def add_user():
@@ -12,15 +12,23 @@ def add_user():
     db.session.commit()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'some-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-db.init_app(app)
-
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
+
+app.config['SECRET_KEY'] = 'some-secret-key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'your-email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your-password'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 login_manager.login_message = 'Please log in to access this page.'
+
+db.init_app(app)
+mail.init_app(app)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -29,7 +37,7 @@ class User(UserMixin, db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return db.session.get(User, user_id)
+    return User.query.get(int(user_id))
 
 @app.route('/')
 def home():
