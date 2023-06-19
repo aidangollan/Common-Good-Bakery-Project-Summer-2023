@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, redirect
 from flask_mail import Message
 from flask_login import login_required
 from init import mail
@@ -23,7 +23,7 @@ def view_transfers():
 @transfer.route('/send_transfer', methods=['POST'])
 @login_required
 def send_transfer():
-    msg = Message('Transfer Notification', sender = 'your-email@gmail.com', recipients = ['specific-email@gmail.com'])
+    msg = Message('Transfer Notification', sender = 'commongoodmailer@gmail.com', recipients = ['aidangollan@icloud.com'])
     msg.body = "A transfer has been sent"
     mail.send(msg)
-    return 'Email sent'
+    return redirect('/transfer')
