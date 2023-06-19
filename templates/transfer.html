@@ -3,6 +3,13 @@
 <head>
     <title>Transfer</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 <body>
     <div style="text-align: right; margin: 10px;">
@@ -11,8 +18,8 @@
     </div>
     <div class="container">
         <h1>Transfer Page</h1>
-        <button onclick="window.location.href='{{ url_for('add_transfer') }}';" class="btn-center">Add Transfer</button>
-        <button onclick="window.location.href='{{ url_for('view_transfers') }}';" class="btn-center">View Open Transfers</button>
+        <a href="{{ url_for('transfer.add_transfer') }}" class="btn btn-primary btn-sm">Add Transfer</a>
+        <a href="{{ url_for('transfer.view_transfers') }}" class="btn btn-primary btn-sm">View Open Transfers</a>
     </div>
 </body>
 </html>

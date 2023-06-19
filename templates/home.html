@@ -8,8 +8,8 @@
     <body>
         <nav>
             <ul class="nav-links">
-                <li><a href="{{ url_for('login', next=url_for('data')) }}">Data</a></li>
-                <li><a href="{{ url_for('login', next=url_for('transfer')) }}">Transfer</a></li>
+                <li><a href="{{ url_for('data') if current_user.is_authenticated else url_for('login', next=url_for('data')) }}">Data</a></li>
+                <li><a href="{{ url_for('transfer.index') if current_user.is_authenticated else url_for('login', next=url_for('transfer.index')) }}">Transfer</a></li>
             </ul>
         </nav>
         <div class="container">

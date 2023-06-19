@@ -1,9 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for, abort
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask import Flask, render_template, request, redirect, url_for
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from transfer import transfer as transfer_blueprint
 from flask_bcrypt import Bcrypt
 from db import db
 from data_handling import Category, update_db
 
+def add_user():
+    hashed_password = bcrypt.generate_password_hash("aaa").decode('utf-8')
+    user = User(username="aidan", password=hashed_password)
+    db.session.add(user)
+    db.session.commit()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'some-secret-key'
@@ -27,6 +33,7 @@ def load_user(user_id):
 
 @app.route('/')
 def home():
+#    add_user()
     update_db(db)
     return render_template('home.html')
 
@@ -35,6 +42,11 @@ def login():
     error_fields = []
     error_message = None
     if request.method == 'POST':
+        next_page = request.form.get('next')
+        if current_user.is_authenticated:
+            if not next_page:
+                next_page = url_for('home')
+            return redirect(next_page)
         username = request.form['username']
         password = request.form['password']
 
@@ -47,9 +59,8 @@ def login():
 
         if user and bcrypt.check_password_hash(user.password, password):
             login_user(user)
-            next_page = request.form.get('next')
             if not next_page:
-                abort(400, description="Missing next parameter for redirection after login")
+                next_page = url_for('home')
             return redirect(next_page)
         else:
             error_message = 'Login Unsuccessful. Please check username and password'
@@ -73,20 +84,8 @@ def data():
 
     return render_template('data.html', categories=categories, locations=locations)
 
-@app.route('/transfer', methods=['GET', 'POST'])
-@login_required
-def transfer():
-    return render_template('transfer.html')
-
-@app.route('/add_transfer', methods=['GET', 'POST'])
-@login_required
-def add_transfer():
-    return render_template('add_transfer.html')
-
-@app.route('/view_transfers', methods=['GET', 'POST'])
-@login_required
-def view_transfers():
-    return render_template('view_transfers.html')
+# Register the transfer blueprint
+app.register_blueprint(transfer_blueprint, url_prefix='/transfer')
 
 if __name__ == '__main__':
     with app.app_context():
