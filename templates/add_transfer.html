@@ -7,7 +7,31 @@
 <body>
     <div class="container">
         <h1>Add Transfer</h1>
-        <!-- Form to add transfer will be implemented here -->
+        <div id="form_container">
+            <!-- The initial form group -->
+            <div class="form-group row">
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" placeholder="Item">
+                </div>
+                <div class="col-sm-3">
+                    <select class="form-control">
+                        <option value="14th">14th</option>
+                        <option value="8th">8th</option>
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" placeholder="Amount">
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control date" placeholder="Date">
+                </div>
+            </div>
+        </div>
+        <!-- The add transfer button -->
+        <button id="add_transfer_button" class="btn btn-primary" type="button">+</button>
     </div>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </body>
 </html>
