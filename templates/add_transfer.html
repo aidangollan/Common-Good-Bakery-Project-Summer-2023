@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Add Transfer</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
@@ -12,30 +11,29 @@
     <div class="container">
         <h1>Add Transfer</h1>
         <div id="form_container">
-            <div class="form-group row">
+            <!-- Transfer item structure -->
+            <div class="form-group row transfer-item">
                 <div class="col-sm-3">
-                    <input type="text" class="form-control" placeholder="Item">
+                    <input type="text" class="form-control" name="item" placeholder="Item">
                 </div>
                 <div class="col-sm-3">
-                    <select class="form-control">
+                    <select class="form-control" name="location">
                         <option value="14th">14th</option>
                         <option value="8th">8th</option>
                     </select>
                 </div>
                 <div class="col-sm-3">
-                    <input type="text" class="form-control" placeholder="Amount">
+                    <input type="text" class="form-control" name="amount" placeholder="Amount">
                 </div>
                 <div class="col-sm-3">
-                    <input type="text" class="form-control date" placeholder="Date">
+                    <input type="text" class="form-control date" name="date" placeholder="Date">
                 </div>
             </div>
         </div>
-        <button id="add_transfer_button" class="btn btn-primary" type="button">+</button>
+        <button id="add_item_button" class="btn btn-primary" type="button">Add Item</button>
+        <button id="submit_transfer_button" class="btn btn-primary" type="button">Submit Transfer</button>
     </div>
-    <button id="add_transfer_button" class="btn btn-primary" type="button">+</button>
-    <form action="{{ url_for('transfer.send_transfer') }}" method="post">
-        <button class="btn btn-primary" type="submit">Send Transfer</button>
-    </form>
+
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>

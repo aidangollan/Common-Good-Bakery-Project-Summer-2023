@@ -12,26 +12,22 @@ $( function() {
     initializeDatepicker();
 
     // The add transfer button click event
-    $("#add_transfer_button").click(function() {
-        var formGroup = '<div class="form-group row">' +
-                            '<div class="col-sm-3">' +
-                                '<input type="text" class="form-control" placeholder="Item">' +
-                            '</div>' +
-                            '<div class="col-sm-3">' +
-                                '<select class="form-control">' +
-                                    '<option value="14th">14th</option>' +
-                                    '<option value="8th">8th</option>' +
-                                '</select>' +
-                            '</div>' +
-                            '<div class="col-sm-3">' +
-                                '<input type="text" class="form-control" placeholder="Amount">' +
-                            '</div>' +
-                            '<div class="col-sm-3">' +
-                                '<input type="text" class="form-control date" placeholder="Date">' +
-                            '</div>' +
-                        '</div>';
-        $("#form_container").append(formGroup);
+    $("#add_item_button").click(function() {
+        var newItem = $(".transfer-item").first().clone();
+        $("#form_container").append(newItem);
         initializeDatepicker();
+    });
+
+    $("#submit_transfer_button").click(function() {
+        var transfers = [];
+        $(".transfer-item").each(function(){
+            var item = $(this).find('input[name="item"]').val();
+            var location = $(this).find('select[name="location"]').val();
+            var amount = $(this).find('input[name="amount"]').val();
+            var date = $(this).find('input[name="date"]').val();
+            transfers.push({item: item, location: location, amount: amount, date: date});
+        });
+        $.post('/add_transfer', {transfers: JSON.stringify(transfers)});
     });
 
     function initializeDatepicker() {
