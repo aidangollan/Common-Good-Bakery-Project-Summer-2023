@@ -1,7 +1,10 @@
-from flask import Blueprint, render_template, redirect, request
+from flask import Blueprint, render_template, redirect, request, jsonify
 from flask_mail import Message
 from flask_login import login_required
 from models import Transfer
+from datetime import datetime
+import json
+import logging
 from init import db, mail
 
 transfer = Blueprint('transfer', __name__)
@@ -15,20 +18,17 @@ def index():
 @login_required
 def add_transfer():
     if request.method == 'POST':
-        transfers = []
-        i = 0
-        while f'item{i}' in request.form:
-            item = request.form.get(f'item{i}')
-            location = request.form.get(f'location{i}')
-            amount = request.form.get(f'amount{i}')
-            date = request.form.get(f'date{i}')
-            transfers.append(Transfer(item=item, location=location, amount=amount, date=date))
-            i += 1
+        transfers = request.form.get('transfers')
+        print(f"Transfers: {transfers}")
+        transfers = json.loads(transfers)
 
-        db.session.add_all(transfers)
+        for t in transfers:
+            date = datetime.strptime(t['date'], '%m/%d/%y')
+            new_transfer = Transfer(item=t['item'], location=t['location'], amount=t['amount'], date=date)
+            db.session.add(new_transfer)
         db.session.commit()
-
-        return 'success', 200
+        send_transfer()
+        return redirect('/transfer')
 
     return render_template('add_transfer.html')
 
@@ -37,10 +37,7 @@ def add_transfer():
 def view_transfers():
     return render_template('view_transfers.html')
 
-@transfer.route('/send_transfer', methods=['POST'])
-@login_required
 def send_transfer():
     msg = Message('Transfer Notification', sender = 'commongoodmailer@gmail.com', recipients = ['aidangollan@icloud.com'])
     msg.body = "A transfer has been sent"
     mail.send(msg)
-    return redirect('/transfer')

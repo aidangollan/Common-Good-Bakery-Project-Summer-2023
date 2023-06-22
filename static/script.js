@@ -18,16 +18,16 @@ $( function() {
         initializeDatepicker();
     });
 
-    $("#submit_transfer_button").click(function() {
+    $("#transfer_form").submit(function() {
         var transfers = [];
-        $(".transfer-item").each(function(index){
+        $(".transfer-item").each(function(){
             var item = $(this).find('input[name="item"]').val();
             var location = $(this).find('select[name="location"]').val();
             var amount = $(this).find('input[name="amount"]').val();
             var date = $(this).find('input[name="date"]').val();
-            transfers.push({[`item${index}`]: item, [`location${index}`]: location, [`amount${index}`]: amount, [`date${index}`]: date});
+            transfers.push({item: item, location: location, amount: amount, date: date});
         });
-        $.post('/add_transfer', transfers);
+        $('#transfers').val(JSON.stringify(transfers));
     });
 
     function initializeDatepicker() {

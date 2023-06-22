@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
 from init import db, mail
 from models import User
+import logging
 from transfer import transfer as transfer_blueprint
 from data_handling import Category, update_db
 

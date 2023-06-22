@@ -34,6 +34,6 @@ class Transfer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     item = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(50), nullable=False)
-    amount = db.Column(db.Float, nullable=False)
+    amount = db.Column(db.String(100), nullable=False)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     
