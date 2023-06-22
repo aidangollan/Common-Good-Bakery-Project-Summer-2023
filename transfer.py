@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, redirect, request, jsonify
+from flask import Blueprint, render_template, redirect, request
 from flask_mail import Message
 from flask_login import login_required
-import json
-from init import mail
+from models import Transfer
+from init import db, mail
 
 transfer = Blueprint('transfer', __name__)
 
@@ -15,14 +15,20 @@ def index():
 @login_required
 def add_transfer():
     if request.method == 'POST':
-        transfers = request.form.get('transfers')
-        transfers = json.loads(transfers)
+        transfers = []
+        i = 0
+        while f'item{i}' in request.form:
+            item = request.form.get(f'item{i}')
+            location = request.form.get(f'location{i}')
+            amount = request.form.get(f'amount{i}')
+            date = request.form.get(f'date{i}')
+            transfers.append(Transfer(item=item, location=location, amount=amount, date=date))
+            i += 1
 
-        for t in transfers:
-            # Save transfers to the database here
-            pass
-            
-        return jsonify({'success': True}), 200
+        db.session.add_all(transfers)
+        db.session.commit()
+
+        return 'success', 200
 
     return render_template('add_transfer.html')
 

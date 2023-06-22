@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
 from init import db, mail
+from models import User
 from transfer import transfer as transfer_blueprint
 from data_handling import Category, update_db
 
@@ -29,11 +30,6 @@ login_manager.login_message = 'Please log in to access this page.'
 
 db.init_app(app)
 mail.init_app(app)
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)
 
 @login_manager.user_loader
 def load_user(user_id):

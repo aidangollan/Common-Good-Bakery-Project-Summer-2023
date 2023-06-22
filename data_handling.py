@@ -1,33 +1,10 @@
-from init import db
 from util import to_float, to_int
 from datetime import datetime
+from models import Category
 import os
 
 PROCESSED_FILES = 'processed_files.txt'
 CSV_FILES_DIR = os.path.join(os.path.dirname(__file__), 'csv_files')
-
-class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    location = db.Column(db.String(100), nullable=False)
-    date = db.Column(db.String(128), nullable=False)
-    name = db.Column(db.String(128), nullable=False)
-    order_count = db.Column(db.Integer, nullable=False)
-    item_count = db.Column(db.Integer, nullable=False)
-    gross_amt = db.Column(db.Integer, nullable=False)
-    discounts = db.Column(db.Float, nullable=False)
-    net = db.Column(db.Float, nullable=False)
-    tax = db.Column(db.Float, nullable=False)
-
-    def __init__(self, location, date, name, order_count, item_count, gross_amt, discounts, net, tax):
-        self.location = location
-        self.date = date
-        self.name = name
-        self.order_count = order_count
-        self.item_count = item_count
-        self.gross_amt = gross_amt
-        self.discounts = discounts
-        self.net = net
-        self.tax = tax
 
 def update_db(db):
     processed_files = load_processed_files()
